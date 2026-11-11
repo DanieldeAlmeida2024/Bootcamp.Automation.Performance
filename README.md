@@ -41,3 +41,7 @@ Temos algumas situações mapeadas no nosso mock que ao registrar algumas massas
 
 
 OBS: Precisa ter o java instalado em sua máquina na versão 11 pra cima.
+
+## Engenharia de software — documentação v1.0.0
+
+[Projeto](docs/projeto/ESPECIFICACAO.md) · [UML](docs/uml/README.md) · [Testes](docs/testes/PLANO_DE_TESTES.md) · [Versões](docs/controle/VERSIONAMENTO.md)

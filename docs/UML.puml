@@ -1,0 +1,17 @@
+@startuml
+title Fluxo conceitual — Bootcamp.Automation.Performance
+actor Usuario
+component "Entrada" as Entrada
+component "Validador" as Validador
+component "Roteiro / Exercício" as Roteiro
+component "Ambiente externo" as Externo
+Usuario --> Entrada
+Entrada --> Validador
+Validador --> Roteiro
+Roteiro --> Externo : se aplicavel
+Roteiro --> Usuario : resultado
+note right of Roteiro
+Diagrama conceitual.
+Nao declara classes existentes.
+end note
+@enduml

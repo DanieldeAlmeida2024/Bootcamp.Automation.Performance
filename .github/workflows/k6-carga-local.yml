@@ -30,11 +30,25 @@ jobs:
         env:
           BASE_URL: http://127.0.0.1:8080
         run: k6 run --summary-export=k6-summary.json tests/live.js
+      - name: Exercitar contratos GET, POST 201, POST 404 e POST 500 (intencionais)
+        env:
+          BASE_URL: http://127.0.0.1:8080
+        run: |
+          for teste in test-consulta test-sucesso test-404 test-500; do
+            echo "::group::k6 ${teste}"
+            k6 run --summary-export="k6-${teste}.json" "tests/${teste}.js"
+            echo "::endgroup::"
+          done
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: k6-wiremock-summary
-          path: k6-summary.json
+          path: |
+            k6-summary.json
+            k6-test-consulta.json
+            k6-test-sucesso.json
+            k6-test-404.json
+            k6-test-500.json
           if-no-files-found: ignore
       - name: Encerrar WireMock
         if: always()

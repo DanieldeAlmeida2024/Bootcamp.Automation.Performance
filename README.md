@@ -56,3 +56,11 @@ Os scripts exigem aprovação de mais de 99% das verificações (`checks`) e tê
 **Escopo:** os cenários medem latência e vazão **do mock local** em carga curta, não latência, vazão nem capacidade de uma aplicação real. O cenário HTTP 500 confirma um erro **propositalmente simulado**, não uma falha inesperada da plataforma.
 
 [Arquitetura](docs/ARQUITETURA.md) · [Plano de testes](docs/PLANO_TESTES.md) · [UML](docs/UML.puml)
+
+## Contratos k6 no CI — GET e três respostas POST
+
+Além da carga curta em `tests/live.js`, o workflow de k6 agora executa **quatro cenários isolados** contra o WireMock iniciado em loopback: `test-consulta.js` (GET 200), `test-sucesso.js` (POST 201), `test-404.js` (POST 404 intencional) e `test-500.js` (POST 500 intencional).
+
+Cada script valida o código e o JSON exatos, por meio do threshold de `checks > 99%`. As respostas 404/500 são **esperadas** e não devem ser interpretadas como indisponibilidade da aplicação. Cada script grava um resumo `k6-test-*.json` junto ao relatório de carga curta `k6-summary.json` no artifact do workflow.
+
+Os testes são feitos **somente com o mock local**, sem consumir APIs externas, sem medir SLA de serviço real e sem promover os stubs a implementação funcional.

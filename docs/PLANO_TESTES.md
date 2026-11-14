@@ -43,3 +43,15 @@ Todos possuem critério `checks > 99%`. O fluxo de CI executa **somente `tests/l
 ## Fora de escopo
 
 Não mede capacidade real sob carga, SLA, produção, persistência, segurança do backend nem integrações com serviços externos. Relatórios HTML preexistentes são artefatos históricos, não resultado da CI desta revisão.
+
+## PERF 1.2.0 — contratos k6 adicionados ao GitHub Actions
+
+| ID | Script executado no CI | Critério de aprovação |
+| --- | --- | --- |
+| PERF-06 | `tests/test-consulta.js` | GET 200, cinco carros e ordem de primeiro/último |
+| PERF-07 | `tests/test-sucesso.js` | POST 201, texto de sucesso e ID fictício 6 |
+| PERF-08 | `tests/test-404.js` | POST 404 **simulado** e corpo previsto |
+| PERF-09 | `tests/test-500.js` | POST 500 **simulado** e corpo previsto |
+| PERF-10 | Relatórios por cenário | `k6-test-consulta.json`, `k6-test-sucesso.json`, `k6-test-404.json`, `k6-test-500.json` |
+
+Os quatro cenários de contrato usam 2 VUs/8 iterações e `checks > 99%`. O cenário separado `tests/live.js` continua com 10 VUs/5 s e limites de latência. **Não** aplicar `http_req_failed < 1%` aos testes que **exigem** códigos 404/500; esses retornos são propositalmente simulados. Nenhum desses scripts representa desempenho de uma API produtiva.

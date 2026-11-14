@@ -39,6 +39,15 @@ jobs:
             k6 run --summary-export="k6-${teste}.json" "tests/${teste}.js"
             echo "::endgroup::"
           done
+      - name: Executar contratos k6 de GET e POST com respostas simuladas
+        env:
+          BASE_URL: http://127.0.0.1:8080
+        run: |
+          set -euo pipefail
+          for script in test-consulta test-sucesso test-404 test-500; do
+            echo "Executando cenário $script"
+            k6 run --summary-export="k6-${script}.json" "tests/${script}.js"
+          done
       - uses: actions/upload-artifact@v4
         if: always()
         with:

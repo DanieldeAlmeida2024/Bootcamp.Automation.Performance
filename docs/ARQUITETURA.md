@@ -20,3 +20,7 @@ O comando de desenvolvimento vincula a interface a `127.0.0.1`; não exponha o m
 - v1.0: arquivos WireMock, scripts k6 e relatórios de exemplo, sem CI que exercesse a API.
 - v1.1: contrato automatizado com servidor real local, checks k6 com thresholds, remoção de script externo para relatório e documentação de comportamento.
 - v1.2: k6 automatizado em CI contra WireMock, thresholds p95/p99/erros e upload de resumo JSON. Não mede backend real.
+
+## Gate de contratos k6 — 14/11/2026
+
+O GitHub Actions primeiro valida o cenário de carga `tests/live.js` (10 VUs/5s), depois executa quatro cenários independentes de contrato HTTP (`tests/test-consulta.js`, `tests/test-sucesso.js`, `tests/test-404.js`, `tests/test-500.js`), cada um com seu resumo de execução. O job falha no primeiro contrato violado e salva os JSON disponíveis como artefatos mesmo quando há erro. O WireMock é restrito a loopback durante a CI.

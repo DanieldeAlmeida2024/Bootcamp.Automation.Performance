@@ -31,6 +31,12 @@ python -m unittest discover -s tests -p 'test_*.py' -v
 
 Os testes em `tests/test_contrato_wiremock.py` iniciam o JAR local em uma porta livre, executam requisições HTTP reais e verificam respostas, incluindo o erro 500 esperado. O workflow `contrato-wiremock.yml` usa Java 17 e Python 3.12. Não há chamadas à AWS nem deploy.
 
+## Carga curta validada automaticamente com k6
+
+O workflow [k6-carga-local.yml](.github/workflows/k6-carga-local.yml) instala k6 via Grafana, inicia WireMock em `127.0.0.1:8080` e executa **10 usuários virtuais por 5 segundos** no `GET /api/cars`. Ele só passa se: mais de 99% dos checks estiverem corretos, taxa de requisição falha <1%, p95 <1500 ms, p99 <3000 ms e houver mais de 30 iterações. O resumo `k6-summary.json` fica disponível como artifact da execução. O job não faz upload para Grafana Cloud nem usa serviços externos de aplicação.
+
+**Essa medição é apenas do WireMock no runner do GitHub**, não um benchmark de API real.
+
 ## Cenários k6
 
 Instale `k6` na sua máquina e mantenha o WireMock ativo. Então execute:
@@ -47,6 +53,6 @@ Para outro endereço local: `k6 run -e BASE_URL=http://127.0.0.1:8080 tests/live
 
 Os scripts exigem aprovação de mais de 99% das verificações (`checks`) e têm limite de 5 segundos por requisição. Os relatórios k6 são exibidos no terminal; foram removidos downloads de JavaScript remoto para gerar HTML.
 
-**Escopo:** esses cenários medem um mock de curta duração, não latência, vazão nem capacidade de uma aplicação real. O cenário HTTP 500 confirma um erro **propositalmente simulado**, não uma falha inesperada da plataforma.
+**Escopo:** os cenários medem latência e vazão **do mock local** em carga curta, não latência, vazão nem capacidade de uma aplicação real. O cenário HTTP 500 confirma um erro **propositalmente simulado**, não uma falha inesperada da plataforma.
 
 [Arquitetura](docs/ARQUITETURA.md) · [Plano de testes](docs/PLANO_TESTES.md) · [UML](docs/UML.puml)

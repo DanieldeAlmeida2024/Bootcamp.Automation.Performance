@@ -1,0 +1,13 @@
+@startuml
+actor Executor
+participant "k6 POST fusca" as K
+participant "WireMock :8080" as W
+participant "mappings/post-cars.json" as M
+Executor -> K : iniciar test-sucesso.js
+K -> W : POST /api/cars (fusca)
+W -> M : casar brand/model/year
+M --> W : 201 + carId=6
+W --> K : response
+K -> K : check(status,message,carId)
+K --> Executor : resultado e métricas
+@enduml

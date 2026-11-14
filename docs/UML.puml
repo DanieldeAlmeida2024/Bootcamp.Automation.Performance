@@ -1,7 +1,7 @@
 @startuml
 title Automação do contrato WireMock
 actor "Teste Python" as Python
-actor "k6 (manual)" as k6
+actor "k6 (GitHub Actions + manual)" as k6
 component "WireMock local :8080" as WM
 collections "mappings/*.json" as stub
 database "__files/cars.json" as catalog

@@ -64,3 +64,9 @@ Além da carga curta em `tests/live.js`, o workflow de k6 agora executa **quatro
 Cada script valida o código e o JSON exatos, por meio do threshold de `checks > 99%`. As respostas 404/500 são **esperadas** e não devem ser interpretadas como indisponibilidade da aplicação. Cada script grava um resumo `k6-test-*.json` junto ao relatório de carga curta `k6-summary.json` no artifact do workflow.
 
 Os testes são feitos **somente com o mock local**, sem consumir APIs externas, sem medir SLA de serviço real e sem promover os stubs a implementação funcional.
+
+## Cenários k6 adicionais no CI
+
+Além do ensaio de carga curta, o workflow executa em sequência `test-consulta.js`, `test-sucesso.js`, `test-404.js` e `test-500.js` contra **WireMock local**. Cada comando falha a job ao violar seus `checks`, e os resumos JSON são anexados como artefatos `k6-wiremock-summary`.
+
+Os retornos 404/500 desses dois últimos cenários são propositalmente simulados; não são falhas inesperadas do backend. Esta verificação não constitui benchmark de aplicação real.

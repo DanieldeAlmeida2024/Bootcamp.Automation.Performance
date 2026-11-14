@@ -1,43 +1,52 @@
-# Bootcamp.Automation.Performance
+# Automação de APIs — WireMock + k6
 
-Mock HTTP de cadastro e consulta de veículos usando WireMock, com testes didáticos.
+Laboratório didático de **contratos HTTP e cenários de carga curta** para uma API fictícia de veículos. A API é simulada por WireMock; não existe serviço de produção nem banco de dados.
 
-## Tecnologias
-Java 11+, WireMock 3.9.1, JavaScript.
+## Iniciar o mock
 
-## Executar
+Requer **Java 17+**. Na raiz do repositório:
+
 ```bash
-java -jar wiremock-standalone-3.9.1.jar
+java -jar wiremock-standalone-3.9.1.jar --port 8080 --bind-address 127.0.0.1 --root-dir .
 ```
 
-**Pré-condições:** Mock não é benchmark de performance; ambiente e cenários reais não foram executados.
+Os mapeamentos são carregados de `mappings/` e os dados de `__files/cars.json`. O servidor escuta apenas a máquina local por padrão.
 
-## Documentos
-- [Requisitos](docs/REQUISITOS.md)
-- [Arquitetura](docs/ARQUITETURA.md)
-- [UML](docs/UML.puml)
-- [Testes](docs/PLANO_TESTES.md)
-- [Instruções para IA](AGENTS.md)
+## Contratos exercitados
 
-## README original preservado
+| Método | Rota | Cenário | Resposta simulada |
+| --- | --- | --- | --- |
+| GET | `/api/cars` | Consultar catálogo | 200; lista fixa de cinco veículos |
+| POST | `/api/cars` | `model: "fusca"` | 201; mensagem de cadastro e `carId: 6` |
+| POST | `/api/cars` | `model: "up tsi"` | 500 **intencional**, configurado no stub |
+| POST | `/api/cars` | Outro modelo | 404; mensagem de não encontrado |
 
-## Projeto de mock da QAZANDO
+O POST **não persiste dados**: a resposta de cadastro é fixa e o GET continua com cinco registros.
 
-Esse projeto temos como exemplo uma api de carros.
+## Testes reais no GitHub Actions
 
-Temos algumas situações mapeadas no nosso mock que ao registrar algumas massas em específico a gente consegue um determinado valor de resposta.
+```bash
+python -m unittest discover -s tests -p 'test_*.py' -v
+```
 
+Os testes em `tests/test_contrato_wiremock.py` iniciam o JAR local em uma porta livre, executam requisições HTTP reais e verificam respostas, incluindo o erro 500 esperado. O workflow `contrato-wiremock.yml` usa Java 17 e Python 3.12. Não há chamadas à AWS nem deploy.
 
-## Exemplos de massas abaixo:
+## Cenários k6
 
-- Cadastro de veículo: Se o cadastro de veículo for igual a um "fusca" no parâmetro "model". = O mock tem que responder 201
-- Cadastro de veículo: Se o cadastro de veículof for igual a um "up tsi" no parâmetro "model" = O mock tem que responder 500
+Instale `k6` na sua máquina e mantenha o WireMock ativo. Então execute:
 
-# Como subir o mock.
+```bash
+k6 run tests/test-consulta.js
+k6 run tests/test-sucesso.js
+k6 run tests/test-404.js
+k6 run tests/test-500.js
+k6 run tests/live.js
+```
 
-- baixar o projeto
-- Acessar a pasta do projeto
-- Rodar o seguinte comando para subir o mock: java -jar wiremock-standalone-3.9.1.jar
+Para outro endereço local: `k6 run -e BASE_URL=http://127.0.0.1:8080 tests/live.js`.
 
+Os scripts exigem aprovação de mais de 99% das verificações (`checks`) e têm limite de 5 segundos por requisição. Os relatórios k6 são exibidos no terminal; foram removidos downloads de JavaScript remoto para gerar HTML.
 
-OBS: Precisa ter o java instalado em sua máquina na versão 11 pra cima.
+**Escopo:** esses cenários medem um mock de curta duração, não latência, vazão nem capacidade de uma aplicação real. O cenário HTTP 500 confirma um erro **propositalmente simulado**, não uma falha inesperada da plataforma.
+
+[Arquitetura](docs/ARQUITETURA.md) · [Plano de testes](docs/PLANO_TESTES.md) · [UML](docs/UML.puml)

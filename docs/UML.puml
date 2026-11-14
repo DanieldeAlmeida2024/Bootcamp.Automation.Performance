@@ -1,17 +1,23 @@
 @startuml
-title Fluxo conceitual — Bootcamp.Automation.Performance
-actor Usuario
-component "Entrada" as Entrada
-component "Validador" as Validador
-component "Roteiro / Exercício" as Roteiro
-component "Ambiente externo" as Externo
-Usuario --> Entrada
-Entrada --> Validador
-Validador --> Roteiro
-Roteiro --> Externo : se aplicavel
-Roteiro --> Usuario : resultado
-note right of Roteiro
-Diagrama conceitual.
-Nao declara classes existentes.
+title Automação do contrato WireMock
+actor "Teste Python" as Python
+actor "k6 (manual)" as k6
+component "WireMock local :8080" as WM
+collections "mappings/*.json" as stub
+database "__files/cars.json" as catalog
+Python --> WM : GET /api/cars
+POST /api/cars
+k6 --> WM : GET /api/cars
+POST /api/cars
+WM --> stub : escolher cenário
+WM --> catalog : GET - arquivo fixo
+note right of stub
+  fusca: 201
+  up tsi: 500 simulado
+  outro modelo: 404
+end note
+note bottom of WM
+  Sem persistência ou autenticação;
+  porta vinculada a localhost.
 end note
 @enduml

@@ -7,7 +7,7 @@ Versão 1.1.0 — 14/11/2026
 - **WireMock 3.9.1**: servidor HTTP local a partir do JAR versionado; utiliza os arquivos `mappings/` e a resposta estática `__files/cars.json`.
 - **Mapeamentos de contrato**: GET 200, POST 201 para `fusca`, POST 500 simulado para `up tsi`, POST 404 para outros modelos.
 - **Testes Python/unittest**: criam uma instância real de WireMock em porta efêmera e fazem requisições com `urllib.request`; verificam os stubs sem bibliotecas HTTP externas.
-- **k6**: cinco cenários independentes, URLs configuráveis por `BASE_URL`, thresholds de `checks`. Os scripts não importam relatórios JavaScript remotamente.
+- **k6**: cinco cenários independentes, URLs configuráveis por `BASE_URL`, thresholds de `checks`. O novo workflow `k6-carga-local.yml` inicia WireMock vinculado a localhost e mede realmente o cenário GET de 10 VUs por 5 segundos, com p95/p99, erros e iterações. Os scripts não importam relatórios JavaScript remotamente.
 
 Os resultados de POST são **determinísticos e não persistentes**. O caminho feliz 201 não significa que o catálogo foi modificado.
 
@@ -19,3 +19,4 @@ O comando de desenvolvimento vincula a interface a `127.0.0.1`; não exponha o m
 
 - v1.0: arquivos WireMock, scripts k6 e relatórios de exemplo, sem CI que exercesse a API.
 - v1.1: contrato automatizado com servidor real local, checks k6 com thresholds, remoção de script externo para relatório e documentação de comportamento.
+- v1.2: k6 automatizado em CI contra WireMock, thresholds p95/p99/erros e upload de resumo JSON. Não mede backend real.

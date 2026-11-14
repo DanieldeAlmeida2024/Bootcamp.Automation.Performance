@@ -1,0 +1,44 @@
+name: k6 — carga curta contra WireMock local
+on:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  carga-local:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: grafana/setup-k6-action@v1
+        with:
+          k6-version: '1.8.0'
+      - name: Iniciar WireMock local para ensaio
+        run: |
+          java -jar wiremock-standalone-3.9.1.jar --port 8080 \
+            --bind-address 127.0.0.1 --root-dir . > /tmp/wiremock-ci.log 2>&1 &
+          echo $! > /tmp/wiremock-ci.pid
+          curl --fail --silent --show-error --retry 20 --retry-connrefused \
+            --retry-delay 1 http://127.0.0.1:8080/api/cars -o /tmp/cars.json
+          python -c 'import json; assert len(json.load(open("/tmp/cars.json")))==5'
+      - name: Executar 10 VUs por 5 segundos e validar p95/p99
+        env:
+          BASE_URL: http://127.0.0.1:8080
+        run: k6 run --summary-export=k6-summary.json tests/live.js
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: k6-wiremock-summary
+          path: k6-summary.json
+          if-no-files-found: ignore
+      - name: Encerrar WireMock
+        if: always()
+        run: |
+          if test -f /tmp/wiremock-ci.pid; then
+            kill "$(cat /tmp/wiremock-ci.pid)" || true
+          fi

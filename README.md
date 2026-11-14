@@ -70,3 +70,9 @@ Os testes são feitos **somente com o mock local**, sem consumir APIs externas, 
 Além do ensaio de carga curta, o workflow executa em sequência `test-consulta.js`, `test-sucesso.js`, `test-404.js` e `test-500.js` contra **WireMock local**. Cada comando falha a job ao violar seus `checks`, e os resumos JSON são anexados como artefatos `k6-wiremock-summary`.
 
 Os retornos 404/500 desses dois últimos cenários são propositalmente simulados; não são falhas inesperadas do backend. Esta verificação não constitui benchmark de aplicação real.
+
+## Modelagem específica e histórico dos cenários
+
+[Especificação](docs/projeto/ESPECIFICACAO.md) · [Matriz histórica](docs/testes/PLANO_DE_TESTES.md) · [UML e fluxos próprios](docs/uml/README.md).
+
+Essas fontes registram a modelagem anterior dos exercícios. O status atual das validações automatizadas, a documentação vigente e os limites de homologação permanecem em [Plano de testes](docs/PLANO_TESTES.md).

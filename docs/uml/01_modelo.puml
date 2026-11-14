@@ -1,0 +1,19 @@
+@startuml
+actor "Executor k6" as Runner
+component "test-sucesso.js" as Ok
+component "test-500.js" as Err
+component "test-consulta.js" as Get
+node "WireMock localhost:8080" as W
+file "mappings/post-cars.json" as S
+file "mappings/post-cars-500.json" as E
+file "report/*.html" as Html
+Runner --> Ok
+Runner --> Err
+Runner --> Get
+Ok --> W
+Err --> W
+Get --> W
+W --> S
+W --> E
+Runner --> Html
+@enduml

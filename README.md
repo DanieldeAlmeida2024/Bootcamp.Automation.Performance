@@ -76,3 +76,9 @@ Os retornos 404/500 desses dois últimos cenários são propositalmente simulado
 [Especificação](docs/projeto/ESPECIFICACAO.md) · [Matriz histórica](docs/testes/PLANO_DE_TESTES.md) · [UML e fluxos próprios](docs/uml/README.md).
 
 Essas fontes registram a modelagem anterior dos exercícios. O status atual das validações automatizadas, a documentação vigente e os limites de homologação permanecem em [Plano de testes](docs/PLANO_TESTES.md).
+
+## Semântica dos erros esperados no k6 — PERF-NEG-04
+
+Os cenários `tests/test-404.js` e `tests/test-500.js` informam ao k6 seus códigos de resposta **intencionalmente simulados** por meio de `http.setResponseCallback(http.expectedStatuses(...))`. Assim, o indicador `http_req_failed` não trata esses retornos como falha de transporte; qualquer outro código ou timeout continua sendo uma falha detectável. Ambos agora têm threshold de `http_req_failed < 1%`, além do `checks > 99%` já existente. A mudança não diminui o nível de validação: cada script continua verificando o JSON específico do contrato de erro.
+
+O CI testa os scripts contra WireMock em loopback; não mede falhas de um serviço verdadeiro. Uma resposta HTTP 500 no mundo real continuaria sendo um sinal de erro: a exceção vale apenas para o cenário negativo do laboratório.

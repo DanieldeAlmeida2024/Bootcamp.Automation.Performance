@@ -1,10 +1,16 @@
 import http from 'k6/http';
+
+// O erro 500 é resultado CONTRATADO deste cenário, não falha de rede.
+http.setResponseCallback(http.expectedStatuses(500));
 import { check, sleep } from 'k6';
 
 export const options = {
   vus: 2,
   iterations: 8,
-  thresholds: { checks: ['rate>0.99'] },
+  thresholds: {
+    checks: ['rate>0.99'],
+    http_req_failed: ['rate<0.01'],
+  },
 };
 
 export default function () {
